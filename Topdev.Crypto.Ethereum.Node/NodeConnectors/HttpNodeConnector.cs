@@ -21,22 +21,9 @@ namespace Topdev.Crypto.Ethereum.Node.NodeConnectors
         {
             var client = new HttpClient();
             var content = new StringContent(request, Encoding.UTF8, "application/json");
-            string responseContent = "";
 
-            try
-            {
-                var response = await client.PostAsync(_address, content);
-
-                responseContent = await response.Content.ReadAsStringAsync();
-
-                if(!response.IsSuccessStatusCode)
-                    throw RpcRequestException.FromJson(responseContent);
-                }
-            catch (Exception exp)
-            {
-                
-            }
-            
+            var response = await client.PostAsync(_address, content);
+            var responseContent = await response.Content.ReadAsStringAsync();
 
             return responseContent;
         }

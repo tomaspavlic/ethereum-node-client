@@ -23,9 +23,13 @@ namespace Topdev.Crypto.Ethereum.Node
             _connector = NodeConnectorFactory.Create(connectionType, address);
         }
 
+        /// <summary>
+        /// Returns a list of addresses owned by client.
+        /// </summary>
+        /// <returns>20 Bytes - addresses owned by the client.</returns>
         public async Task<string[]> GetAccountsAsync() 
         {
-            var result = await InvokeAsync<string[]>("geth_accounts", null);
+            var result = await InvokeAsync<string[]>("eth_accounts", null);
             return result.Result;
         }
 
@@ -50,6 +54,42 @@ namespace Topdev.Crypto.Ethereum.Node
             return response.Result;
         }
 
+        /// <summary>
+        /// Returns the current network protocol version.
+        /// </summary>
+        /// <returns>The current network protocol version</returns>
+        public async Task<string> GetNetVersion()
+        {
+            var response = await InvokeAsync<string>("net_version", null);
+            return response.Result;
+        }
+
+        /// <summary>
+        /// Returns true if client is actively listening for network connections.
+        /// </summary>
+        /// <returns>Boolean - true when listening, otherwise false.</returns>
+        public async Task<bool> GetNetListening()
+        {
+            var response = await InvokeAsync<bool>("net_listening", null);
+            return response.Result;
+        }
+
+        /// <summary>
+        /// Returns number of peers currenly connected to the client.
+        /// </summary>
+        /// <returns>QUANTITY - integer of the number of connected peers.</returns>
+        public async Task<int> GetNetPeerCount()
+        {
+            var response = await InvokeAsync<string>("net_peerCount", null);
+
+            int netPeerCount = int.Parse(
+                response.Result.Replace("0x", ""), 
+                System.Globalization.NumberStyles.HexNumber);
+
+            return netPeerCount;
+        }
+
+
         private async Task<RpcResponse<T>> InvokeAsync<T>(string method, params string[] parameters)
         {
             if (parameters == null)
@@ -58,6 +98,9 @@ namespace Topdev.Crypto.Ethereum.Node
             var request = GenerateRequest(method, parameters);
             string requestSerialized = JsonConvert.SerializeObject(request);
             var response = await _connector.SendRequestAsync(requestSerialized, request.Id);
+
+            if(response.Contains("error"))
+                throw RpcRequestException.FromJson(response);
 
             return (RpcResponse<T>)JsonConvert.DeserializeObject(response, typeof(RpcResponse<T>));
         }

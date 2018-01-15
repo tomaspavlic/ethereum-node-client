@@ -37,5 +37,18 @@ namespace Topdev.Crypto.Ethereum.Node.Tests
 
             Assert.AreEqual("0x47173285a8d7341e5e972fc677286384f802f8ef42a5ec5f03bbfa254cb01fad", sha3);
         }
+
+        [TestMethod]
+        public async Task TestGetNetVersion()
+        {
+            var version = await _nodeClient.GetNetVersion();
+        }
+
+        [TestMethod]
+        public async Task TestGetNetPeerCount()
+        {
+            int netPeerCount = await _nodeClient.GetNetPeerCount();
+            Assert.IsTrue(netPeerCount > 0);
+        }
     }
 }
