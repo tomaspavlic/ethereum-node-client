@@ -96,11 +96,11 @@ namespace Topdev.Crypto.Ethereum.Node
         /// Returns the current ethereum protocol version.
         /// </summary>
         /// <returns>The current ethereum protocol version</returns>
-        public async Task<string> GetProtocolVersionAsync()
+        public async Task<int> GetProtocolVersionAsync()
         {
             var response = await InvokeAsync<string>("eth_protocolVersion", null);
 
-            return response.Result;
+            return response.Result.ToInt();
         }
 
         /// <summary>
